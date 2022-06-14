@@ -1,0 +1,6 @@
+name: surchable
+
+services:
+  db:
+    image: "postgres:14"
+    restart: unless-stopped
