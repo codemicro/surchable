@@ -6,11 +6,11 @@ RUN pip install poetry
 
 WORKDIR /usr/src/app
 
+RUN mkdir ./crawler
+COPY ./ ./crawler
 COPY ../poetry.lock ../pyproject.toml ./
 
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-interaction
-
-COPY ./crawler ./
 
 CMD ["poetry", "run", "python", "./crawler"]
