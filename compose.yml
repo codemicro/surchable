@@ -4,3 +4,33 @@ services:
   db:
     image: "postgres:14"
     restart: unless-stopped
+    volumes:
+      - ./surchable/db:/var/lib/postgresql/data
+    environment:
+      - "POSTGRES_DB={$SURCHABLE_DB_DATABASE_NAME}"
+      - "POSTGRES_USER={$SURCHABLE_DB_USER}"
+      - "POSTGRES_PASSWORD={$SURCHABLE_DB_PASSWORD}"
+  
+  coordinator:
+    image: "ghrc.io/codemicro/surchable/coordinator:latest"
+    build:
+      context: "coordinator"
+      dockerfile: "Dockerfile"
+    env_file:
+      - ".env"
+  
+  webui:
+    image: "ghcr.io/codemicro/surchable/webui:latest"
+    build:
+      context: "webui"
+      dockerfile: "Dockerfile"
+    env_file:
+      - ".env"
+
+  crawler:
+    image: "ghcr.io/codemicro/surchable/crawler:latest"
+    build:
+      context: "crawler"
+      dockerfile: "Dockerfile"
+    env_file:
+      - ".env"
