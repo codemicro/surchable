@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func main() {
-	fmt.Println("Frontend")
+	fmt.Printf("WebUI: %#v\n", os.Environ())
 }
