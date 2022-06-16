@@ -13,7 +13,7 @@ import (
 )
 
 type DB struct {
-	db *sql.DB
+	pool *sql.DB
 }
 
 func New() (*DB, error) {
@@ -25,12 +25,12 @@ func New() (*DB, error) {
 	}
 
 	rtn := &DB{
-		db: db,
+		pool: db,
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	if err := rtn.db.PingContext(ctx); err != nil {
+	if err := rtn.pool.PingContext(ctx); err != nil {
 		return nil, errors.Wrap(err, "could not ping database")
 	}
 

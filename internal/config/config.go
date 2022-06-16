@@ -38,6 +38,7 @@ var DB = struct {
 	User         string
 	Password     string
 	Host         string
+	TablePrefix  string
 }{
 	DatabaseName: requireEnvVar("SURCHABLE_DB_DATABASE_NAME"),
 	User:         requireEnvVar("SURCHABLE_DB_USER"),
