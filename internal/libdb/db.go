@@ -4,9 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/codemicro/surchable/internal/config"
 	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -19,14 +21,18 @@ func New() (*DB, error) {
 	log.Debug().Str("dsn", dsn).Msg("Connecting to PostgreSQL")
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "could not open SQL connection")
 	}
 
-	return &DB{
+	rtn := &DB{
 		db: db,
-	}, nil
-}
+	}
 
-func (db *DB) MakeConn() (*sql.Conn, error) {
-	return db.db.Conn(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	if err := rtn.db.PingContext(ctx); err != nil {
+		return nil, errors.Wrap(err, "could not ping database")
+	}
+
+	return rtn, nil
 }
