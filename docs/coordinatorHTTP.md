@@ -8,7 +8,7 @@ Example body:
 
 ```json
 {
-    "domain": "tdpain.net", // required - does not include subdomains
+    "domain": "tdpain.net", // required
 }
 ```
 
