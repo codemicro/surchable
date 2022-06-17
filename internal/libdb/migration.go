@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	_ "embed"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -69,51 +70,15 @@ func (db *DB) Migrate() error {
 	)
 }
 
+//go:embed migrations/0to1.sql
+var migrate0to1SQL string
+
 func migrate0to1(trans *sql.Tx) error {
 	log.Info().Msg("migrating new database to v1")
 
-	_, err := trans.Exec(`CREATE TABLE "domain_queue"
-	(
-		id         uuid      not null primary key,
-		created_at timestamp not null default now(),
-		domain     varchar(253),
-		subdomain  varchar(253)
-	);`)
+	_, err := trans.Exec(migrate0to1SQL)
 	if err != nil {
-		return errors.Wrap(err, "failed to create `domain_queue` table")
-	}
-
-	_, err = trans.Exec(`CREATE TABLE "page_loads"
-	(
-		id              uuid      not null primary key,
-		url             text      not null,
-		content         text,
-		loaded_at       timestamp not null default now(),
-		not_load_before timestamp
-	);`)
-	if err != nil {
-		return errors.Wrap(err, "failed to create `page_loads` table")
-	}
-
-	_, err = trans.Exec(`CREATE TABLE "current_jobs"
-	(
-		id            uuid      not null primary key,
-		queue_item    uuid      not null references domain_queue (id),
-		worker_id     uuid      not null,
-		last_check_in timestamp not null
-	);`)
-	if err != nil {
-		return errors.Wrap(err, "failed to create `current_jobs` table")
-	}
-
-	_, err = trans.Exec(`CREATE TABLE "version"
-	(
-		version int
-	);
-	INSERT INTO "version"(version)
-	VALUES (1);`)
-	if err != nil {
-		return errors.Wrap(err, "failed to create `version` table and insert version number")
+		return errors.Wrap(err, "failed to migrate database version from v0 to v1")
 	}
 
 	return nil
