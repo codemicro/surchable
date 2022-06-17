@@ -20,12 +20,7 @@ func (db *DB) Migrate() error {
 	if err != nil {
 		return errors.WithMessage(err, "could not begin transaction")
 	}
-	defer func() {
-		err := tx.Rollback()
-		if err != nil && !errors.Is(err, sql.ErrTxDone) {
-			log.Warn().Stack().Err(errors.WithStack(err)).Msg("failed to rollback transaction")
-		}
-	}()
+	defer smartRollback(tx)
 
 	rows, err := db.pool.Query(`SELECT "table_name" FROM "information_schema"."tables" WHERE "table_schema" = 'public';`)
 	if err != nil {
@@ -44,7 +39,7 @@ func (db *DB) Migrate() error {
 
 	var databaseVersion int
 
-	if _, found := existingTables[tableNameVersion]; found {
+	if _, found := existingTables["version"]; found {
 		err := db.pool.QueryRow(`SELECT "version" FROM "version";`).Scan(&databaseVersion)
 		if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			return errors.WithStack(err)

@@ -3,10 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/codemicro/surchable/coordinator/urls"
+	"github.com/codemicro/surchable/coordinator/endpoints"
 	"github.com/codemicro/surchable/internal/config"
 	db "github.com/codemicro/surchable/internal/libdb"
-	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -21,7 +20,8 @@ func run() error {
 		return errors.Wrap(err, "failed migration")
 	}
 
-	app := setupApp()
+	e := endpoints.New(database)
+	app := e.SetupApp()
 
 	serveAddr := config.Coordinator.ServeHost + ":" + config.Coordinator.ServePort
 
@@ -40,14 +40,4 @@ func main() {
 		fmt.Printf("%+v\n", err)
 		log.Error().Stack().Err(err).Msg("failed to run coordinator")
 	}
-}
-
-func setupApp() *fiber.App {
-	app := fiber.New()
-
-	app.Get(urls.OK, func(ctx *fiber.Ctx) error {
-		return ctx.JSON(map[string]string{"status": "ok"})
-	})
-
-	return app
 }

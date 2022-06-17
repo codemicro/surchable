@@ -3,17 +3,16 @@
 
 CREATE TABLE "domain_queue"
 (
-    id         uuid      not null primary key,
-    created_at timestamp not null default now(),
-    domain     varchar(253),
-    subdomain  varchar(253)
+    id         UUID      NOT NULL PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL DEFAULT now(),
+    domain     VARCHAR(253) UNIQUE NOT NULL
 );
 
 CREATE TABLE "page_loads"
 (
     id              UUID      NOT NULL PRIMARY KEY,
     url             TEXT      NOT NULL,
-    content         TEXT,
+    content_sha1    VARCHAR(40),
     loaded_at       TIMESTAMP NOT NULL DEFAULT now(),
     not_load_before TIMESTAMP
 );

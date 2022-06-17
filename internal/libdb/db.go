@@ -59,3 +59,10 @@ func New() (*DB, error) {
 
 	return rtn, nil
 }
+
+func smartRollback(tx *sql.Tx) {
+	err := tx.Rollback()
+	if err != nil && !errors.Is(err, sql.ErrTxDone) {
+		log.Warn().Stack().Err(errors.WithStack(err)).Str("location", "smartRollback").Msg("failed to rollback transaction")
+	}
+}
