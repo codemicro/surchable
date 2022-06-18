@@ -3,8 +3,8 @@
 
 CREATE TABLE "domain_queue"
 (
-    id         UUID      NOT NULL PRIMARY KEY,
-    created_at TIMESTAMP NOT NULL DEFAULT now(),
+    id         UUID                NOT NULL PRIMARY KEY,
+    created_at TIMESTAMP           NOT NULL DEFAULT now(),
     domain     VARCHAR(253) UNIQUE NOT NULL
 );
 
@@ -19,10 +19,10 @@ CREATE TABLE "page_loads"
 
 CREATE TABLE "current_jobs"
 (
-    id            UUID      NOT NULL PRIMARY KEY,
-    queue_item    UUID      NOT NULL REFERENCES domain_queue (id),
-    worker_id     UUID      NOT NULL,
-    last_check_in TIMESTAMP NOT NULL
+    id            UUID        NOT NULL PRIMARY KEY,
+    queue_item    UUID        NOT NULL REFERENCES "domain_queue" (id),
+    worker_id     TEXT UNIQUE NOT NULL,
+    last_check_in TIMESTAMP   NOT NULL DEFAULT now()
 );
 
 CREATE TABLE "version"

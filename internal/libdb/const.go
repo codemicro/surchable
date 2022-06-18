@@ -1,3 +1,6 @@
 package db
 
-const errorCodeUniqueViolation = "23505"
+const (
+	errorCodeNotNullViolation = "23502"
+	errorCodeUniqueViolation  = "23505"
+)

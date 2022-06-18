@@ -7,6 +7,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+const headerCrawlerID = "X-Crawler-ID"
+
 type Endpoints struct {
 	db *db.DB
 }
@@ -24,7 +26,8 @@ func (e *Endpoints) SetupApp() *fiber.App {
 
 	app.Get(urls.OK, e.GetStatus)
 
-	app.Post(urls.AddDomainToCrawlQueue, e.PostAddDomainToQueue)
+	app.Post(urls.AddDomainToCrawlQueue, e.Post_AddDomainToQueue)
+	app.Get(urls.CrawlerRequestJob, e.Get_CrawlerRequestJob)
 
 	return app
 }
