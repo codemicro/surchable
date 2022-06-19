@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "surchable"
+name = "crawler"
 version = "22.06"
 description = ""
 authors = ["AKP <tom@tdpain.net>"]

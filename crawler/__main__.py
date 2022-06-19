@@ -1,4 +1,3 @@
-import os
 from typing import *
 import structlog
 
@@ -33,9 +32,6 @@ def main():
         config.COORDINATOR_SERVE_HOST, config.COORDINATOR_SERVE_PORT
     )
     coord.ping()
-
-    logger = structlog.get_logger()
-    logger.info("ok!")
 
 
 if __name__ == "__main__":
