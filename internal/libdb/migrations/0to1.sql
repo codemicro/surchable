@@ -10,10 +10,11 @@ CREATE TABLE "domain_queue"
 
 CREATE TABLE "page_loads"
 (
-    id              UUID      NOT NULL PRIMARY KEY,
-    url             TEXT      NOT NULL,
+    id              UUID        NOT NULL PRIMARY KEY,
+    url             TEXT UNIQUE NOT NULL,
+    normalised_url  TEXT UNIQUE NOT NULL
     content_sha1    VARCHAR(40),
-    loaded_at       TIMESTAMP NOT NULL DEFAULT now(),
+    loaded_at       TIMESTAMP   NOT NULL DEFAULT now(),
     not_load_before TIMESTAMP
 );
 
