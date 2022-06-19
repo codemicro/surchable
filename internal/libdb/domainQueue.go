@@ -11,7 +11,7 @@ import (
 
 var ErrDomainAlreadyQueued = errors.New("db: domain already queued")
 
-func (db *DB) DomainQueueInsert(domain string) (*uuid.UUID, error) {
+func (db *DB) AddDomainToQueue(domain string) (*uuid.UUID, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -50,7 +50,7 @@ type QueueItem struct {
 	Domain string
 }
 
-func (db *DB) DomainQueueFetch(id uuid.UUID) (*QueueItem, error) {
+func (db *DB) QueryDomainQueue(id uuid.UUID) (*QueueItem, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -78,10 +78,10 @@ type CurrentJob struct {
 
 var (
 	ErrNoQueuedDomains = errors.New("db: no queued domains")
-	ErrWorkerIDInUse = errors.New("db: worker ID in use")
+	ErrCrawlerIDInUse = errors.New("db: crawler ID in use")
 )
 
-func (db *DB) RequestJob(workerID string) (*CurrentJob, error) {
+func (db *DB) RequestJobForCrawler(workerID string) (*CurrentJob, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -93,7 +93,7 @@ func (db *DB) RequestJob(workerID string) (*CurrentJob, error) {
 
 	newID := uuid.New()
 
-	stmt, err := tx.Prepare(`INSERT INTO "current_jobs"("id", "queue_item", "worker_id")
+	stmt, err := tx.Prepare(`INSERT INTO "current_jobs"("id", "queue_item", "crawler_id")
 	VALUES ($1,
 			(SELECT "id"
 			 FROM "domain_queue"
@@ -117,7 +117,7 @@ func (db *DB) RequestJob(workerID string) (*CurrentJob, error) {
 				return nil, ErrNoQueuedDomains
 			case errorCodeUniqueViolation:
 				if e.Constraint == "current_jobs_worker_id_key" {
-					return nil, ErrWorkerIDInUse
+					return nil, ErrCrawlerIDInUse
 				}
 			}
 		}

@@ -21,7 +21,7 @@ CREATE TABLE "current_jobs"
 (
     id            UUID        NOT NULL PRIMARY KEY,
     queue_item    UUID        NOT NULL REFERENCES "domain_queue" (id),
-    worker_id     TEXT UNIQUE NOT NULL,
+    crawler_id    TEXT UNIQUE NOT NULL,
     last_check_in TIMESTAMP   NOT NULL DEFAULT now()
 );
 

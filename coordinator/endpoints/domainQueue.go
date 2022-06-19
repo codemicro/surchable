@@ -23,7 +23,7 @@ func (e *Endpoints) Post_AddDomainToQueue(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	id, err := e.db.DomainQueueInsert(inputData.Domain)
+	id, err := e.db.AddDomainToQueue(inputData.Domain)
 	if err != nil {
 		if errors.Is(err, db.ErrDomainAlreadyQueued) {
 			return util.NewRichError(fiber.StatusConflict, "domain already queued", nil)
@@ -47,9 +47,9 @@ func (e *Endpoints) Get_CrawlerRequestJob(ctx *fiber.Ctx) error {
 		return util.NewRichError(fiber.StatusBadRequest, fmt.Sprintf("%s header missing", headerCrawlerID), nil)
 	}
 
-	createdJob, err := e.db.RequestJob(crawlerID)
+	createdJob, err := e.db.RequestJobForCrawler(crawlerID)
 	if err != nil {
-		if errors.Is(err, db.ErrWorkerIDInUse) {
+		if errors.Is(err, db.ErrCrawlerIDInUse) {
 			return util.NewRichError(fiber.StatusConflict, "crawler ID in use", nil)
 		} else if errors.Is(err, db.ErrNoQueuedDomains) {
 			ctx.Status(fiber.StatusNoContent)
@@ -58,7 +58,7 @@ func (e *Endpoints) Get_CrawlerRequestJob(ctx *fiber.Ctx) error {
 		return errors.WithStack(err)
 	}
 
-	queueItem, err := e.db.DomainQueueFetch(createdJob.QueueItem)
+	queueItem, err := e.db.QueryDomainQueue(createdJob.QueueItem)
 	if err != nil {
 		return errors.WithStack(err)
 	}
