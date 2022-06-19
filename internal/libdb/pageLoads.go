@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/codemicro/surchable/internal/util"
-	"github.com/gofiber/fiber/v2/internal/uuid"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
