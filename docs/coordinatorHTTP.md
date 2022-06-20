@@ -1,5 +1,7 @@
 # Coordinator HTTP protocol
 
+In addition to any codes listed below, you may encounter errors such as `400 Bad Request` if malformed JSON bodies are sent.
+
 ## Add domain to crawl queue
 
 **`POST /job/add`**
@@ -66,5 +68,34 @@ Possible responses:
     {
         "message": "crawler ID in use",
         "status": "error"
+    }
+    ```
+
+## Crawler request preflight check
+
+**`POST /page/preflight`**
+
+Check to see if the page was requested recently and be told if the page should be loaded again.
+
+Request body:
+
+```json
+{
+    "url": "https://www.example.com/cheesecake"
+}
+```
+
+Possible responses:
+
+* **200 OK** - not loaded recently, go ahead
+    ```json
+    {
+        "permission": "LOAD"
+    }
+    ```
+* **200 OK** - loaded recently, move on to the next, please
+    ```json
+    {
+        "permission": "SKIP"
     }
     ```

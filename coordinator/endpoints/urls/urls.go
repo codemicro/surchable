@@ -5,4 +5,6 @@ const (
 
 	AddDomainToCrawlQueue = "/job/add"
 	CrawlerRequestJob     = "/job/request"
+
+	RequestPreflightCheck = "/page/preflight"
 )
