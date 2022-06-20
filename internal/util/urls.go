@@ -1,18 +1,14 @@
 package util
 
 import (
-	"net/url"
-
+	"github.com/PuerkitoBio/purell"
 	"github.com/pkg/errors"
 )
 
 func NormaliseURL(inputURL string) (string, error) {
-	u, err := url.Parse(inputURL)
-	if err != nil {
-		return "", errors.WithStack(err)
-	}
-	if u.Scheme == "https" {
-		u.Scheme = "http"
-	}
-	return u.String(), nil
+	normalisedURL, err := purell.NormalizeURLString(
+		inputURL,
+		purell.FlagsUsuallySafeGreedy|purell.FlagForceHTTP,
+	)
+	return normalisedURL, errors.WithStack(err)
 }
