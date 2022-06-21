@@ -33,19 +33,28 @@ func envVarDefault(key string, defaultValue string) string {
 	return x
 }
 
+/*[[[cog
+import cog
+from generateMappings import *
+cog.outl(
+	generate_golang_configuration(
+		parse_configuration(
+			load_raw_configuration(),
+		),
+	),
+)
+]]]*/
 var DB = struct {
 	DatabaseName string
 	User         string
 	Password     string
 	Host         string
-	TablePrefix  string
 }{
 	DatabaseName: requireEnvVar("SURCHABLE_DB_DATABASE_NAME"),
 	User:         requireEnvVar("SURCHABLE_DB_USER"),
 	Password:     requireEnvVar("SURCHABLE_DB_PASSWORD"),
 	Host:         requireEnvVar("SURCHABLE_DB_HOST"),
 }
-
 var Coordinator = struct {
 	ServePort string
 	ServeHost string
@@ -53,3 +62,5 @@ var Coordinator = struct {
 	ServePort: envVarDefault("SURCHABLE_COORDINATOR_SERVE_PORT", "7200"),
 	ServeHost: envVarDefault("SURCHABLE_COORDINATOR_SERVE_HOST", "0.0.0.0"),
 }
+
+// [[[end]]]
