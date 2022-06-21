@@ -8,6 +8,14 @@ CREATE TABLE "domain_queue"
     domain     VARCHAR(253) UNIQUE NOT NULL
 );
 
+CREATE TABLE "current_jobs"
+(
+    id            UUID        NOT NULL PRIMARY KEY,
+    queue_item    UUID        NOT NULL REFERENCES "domain_queue" (id),
+    crawler_id    TEXT UNIQUE NOT NULL,
+    last_check_in TIMESTAMP   NOT NULL DEFAULT now()
+);
+
 CREATE TABLE "page_loads"
 (
     id              UUID        NOT NULL PRIMARY KEY,
@@ -18,12 +26,15 @@ CREATE TABLE "page_loads"
     not_load_before TIMESTAMP
 );
 
-CREATE TABLE "current_jobs"
+CREATE TABLE "page_information"
 (
-    id            UUID        NOT NULL PRIMARY KEY,
-    queue_item    UUID        NOT NULL REFERENCES "domain_queue" (id),
-    crawler_id    TEXT UNIQUE NOT NULL,
-    last_check_in TIMESTAMP   NOT NULL DEFAULT now()
+    id                         UUID NOT NULL PRIMARY KEY,
+    load_id                    UUID NOT NULL REFERENCES "page_loads" (id),
+    page_title                 TEXT,
+    page_meta_description_text TEXT,
+    page_content_text          TEXT,
+    page_raw_html              TEXT NOT NULL,
+    outbound_links             TEXT ARRAY
 );
 
 CREATE TABLE "version"
