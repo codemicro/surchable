@@ -1,0 +1,7 @@
+must DB.DatabaseName SURCHABLE_DB_DATABASE_NAME
+must DB.User         SURCHABLE_DB_USER
+must DB.Password     SURCHABLE_DB_PASSWORD
+must DB.Host         SURCHABLE_DB_HOST
+
+default 7200    Coordinator.ServePort SURCHABLE_COORDINATOR_SERVE_PORT
+default 0.0.0.0 Coordinator.ServeHost SURCHABLE_COORDINATOR_SERVE_HOST
