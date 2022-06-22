@@ -15,7 +15,8 @@ import (
 )
 
 type DB struct {
-	pool *sql.DB
+	pool           *sql.DB
+	ContextTimeout time.Duration
 }
 
 const maxConnectionAttempts = 4
@@ -29,7 +30,8 @@ func New() (*DB, error) {
 	}
 
 	rtn := &DB{
-		pool: db,
+		pool:           db,
+		ContextTimeout: time.Second,
 	}
 
 	for i := 1; i <= maxConnectionAttempts; i += 1 {
@@ -58,6 +60,10 @@ func New() (*DB, error) {
 	}
 
 	return rtn, nil
+}
+
+func (db *DB) newContext() (context.Context, func()) {
+	return context.WithTimeout(context.Background(), db.ContextTimeout)
 }
 
 func smartRollback(tx *sql.Tx) {

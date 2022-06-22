@@ -47,3 +47,39 @@ func (db *DB) QueryPageLoadsByURL(url string) (*PageLoad, error) {
 
 	return pageLoad, nil
 }
+
+func (db *DB) InsertPageLoad(pl *PageLoad) error {
+	if pl.ID == uuid.Nil {
+		pl.ID = uuid.New()
+	}
+
+	x, err := util.NormaliseURL(pl.URL)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	pl.NormalisedURL = x
+
+	ctx, cancel := db.newContext()
+	defer cancel()
+
+	tx, err := db.pool.BeginTx(ctx, nil)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	defer smartRollback(tx)
+
+	_, err = tx.Exec(
+		`INSERT INTO "page_loads"("id", "url", "normalised_url", "loaded_at", "not_load_before") VALUES($1, $2, $3, $4, $5);`,
+		pl.ID,
+		pl.URL,
+		pl.NormalisedURL,
+		pl.LoadedAt,
+		pl.NotLoadBefore,
+	)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
+}
