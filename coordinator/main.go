@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/codemicro/surchable/coordinator/endpoints"
 	"github.com/codemicro/surchable/internal/config"
@@ -19,6 +20,8 @@ func run() error {
 	if err := database.Migrate(); err != nil {
 		return errors.Wrap(err, "failed migration")
 	}
+
+	startTimeoutWorker(database, time.Minute*10)
 
 	e := endpoints.New(database)
 	app := e.SetupApp()
@@ -40,4 +43,17 @@ func main() {
 		fmt.Printf("%+v\n", err)
 		log.Error().Stack().Err(err).Msg("failed to run coordinator")
 	}
+}
+
+func startTimeoutWorker(database *db.DB, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	go func() {
+		for range ticker.C {
+			log.Info().Msg("running job timeout worker")
+			err := database.RemoveTimedOutJobs()
+			if err != nil {
+				log.Error().Err(err).Str("location", "timeoutWorker").Send()
+			}
+		}
+	}()
 }

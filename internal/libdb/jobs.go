@@ -94,3 +94,24 @@ func (db *DB) UpdateTimeForJobByWorkerID(workerID string, checkInTime time.Time)
 		tx.Commit(),
 	)
 }
+
+func (db *DB) RemoveTimedOutJobs() error {
+	ctx, cancel := db.newContext()
+	defer cancel()
+
+	tx, err := db.pool.BeginTx(ctx, nil)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	defer smartRollback(tx)
+
+	if _, err := tx.Exec(
+		`DELETE FROM "current_jobs" WHERE "last_check_in" < now()-'10 minute'::interval;`,
+	); err != nil {
+		return err
+	}
+
+	return errors.WithStack(
+		tx.Commit(),
+	)
+}
