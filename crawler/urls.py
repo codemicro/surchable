@@ -13,5 +13,6 @@ OK = "/ok"
 ADD_DOMAIN_TO_CRAWL_QUEUE = "/job/add"
 CRAWLER_REQUEST_JOB = "/job/request"
 REQUEST_PREFLIGHT_CHECK = "/page/preflight"
+DIGEST_PAGE_LOAD = "/page/digest"
 
 # [[[end]]]

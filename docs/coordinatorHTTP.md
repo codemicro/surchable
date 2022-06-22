@@ -99,3 +99,30 @@ Possible responses:
         "permission": "SKIP"
     }
     ```
+  
+## Digest loaded page
+
+**`POST /page/digest`**
+
+Request body:
+
+```json
+{
+  "url": "https://www.popularmechanics.com/home/interior-projects/a30743006/how-to-clean-mold-mildew/", // required
+  "title": "How to Battle Mould and Mildew in Your Home",
+  "description": "These unwelcome fungi cling to any damp area. You must destroy them.",
+  "content": "One of the most common and challenging problems facing homeowners today...",
+  "html": "<!DOCTYPE html><html><head>...", // required
+  "notLoadBefore": 5, // wait 5 minutes before loading again, default 60. probably derived from headers.
+  "outboundLinks": [
+    "https://www.popularmechanics.com/author/6836/joseph-truini/",
+    "https://www.popularmechanics.com/space/a40230192/dyson-sphere-immortality/",
+    "..."
+  ],
+  "loadedAt": "1985-04-12T23:20:50.52Z" // required
+}
+```
+
+Possible responses:
+
+* **204 No Content** - all's good.
