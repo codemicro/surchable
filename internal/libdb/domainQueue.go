@@ -20,14 +20,8 @@ func (db *DB) AddDomainToQueue(domain string) (*uuid.UUID, error) {
 	}
 	defer smartRollback(tx)
 
-	stmt, err := tx.Prepare(`INSERT INTO "domain_queue"("id", "domain") VALUES($1, $2)`)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	defer stmt.Close()
-
 	id := uuid.New()
-	if _, err := stmt.Exec(id, domain); err != nil {
+	if _, err := tx.Exec(`INSERT INTO "domain_queue"("id", "domain") VALUES($1, $2)`, id, domain); err != nil {
 		if e, ok := err.(*pq.Error); ok {
 			if e.Code == errorCodeUniqueViolation {
 				return nil, ErrDomainAlreadyQueued
@@ -53,15 +47,13 @@ func (db *DB) QueryDomainQueue(id uuid.UUID) (*QueueItem, error) {
 	ctx, cancel := db.newContext()
 	defer cancel()
 
-	stmt, err := db.pool.PrepareContext(ctx, `SELECT "id", "created_at", "domain" FROM "domain_queue" WHERE "id" = $1;`)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	defer stmt.Close()
-
 	qi := new(QueueItem)
 
-	if err := stmt.QueryRow(id).Scan(&qi.ID, &qi.CreatedAt, &qi.Domain); err != nil {
+	if err := db.pool.QueryRowContext(
+		ctx,
+		`SELECT "id", "created_at", "domain" FROM "domain_queue" WHERE "id" = $1;`,
+		id,
+	).Scan(&qi.ID, &qi.CreatedAt, &qi.Domain); err != nil {
 		return nil, errors.Wrap(err, "could not scan")
 	}
 

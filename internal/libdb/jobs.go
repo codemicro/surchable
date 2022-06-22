@@ -31,21 +31,15 @@ func (db *DB) RequestJobForCrawler(workerID string) (*CurrentJob, error) {
 
 	newID := uuid.New()
 
-	stmt, err := tx.Prepare(`INSERT INTO "current_jobs"("id", "queue_item", "crawler_id")
+	var queueItem uuid.UUID
+	row := tx.QueryRow(`INSERT INTO "current_jobs"("id", "queue_item", "crawler_id")
 	VALUES ($1,
 			(SELECT "id"
 			 FROM "domain_queue"
 			 WHERE "id" NOT IN (SELECT "queue_item" FROM "current_jobs")
 			 ORDER BY "created_at"
 			 LIMIT 1), $2)
-	RETURNING "current_jobs"."queue_item";`)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	defer stmt.Close()
-
-	var queueItem uuid.UUID
-	row := stmt.QueryRow(newID, workerID)
+	RETURNING "current_jobs"."queue_item";`, newID, workerID)
 	if err := row.Scan(&queueItem); err != nil {
 		if e, ok := err.(*pq.Error); ok {
 			// If the subquery returns no results, it'll fail with this error
