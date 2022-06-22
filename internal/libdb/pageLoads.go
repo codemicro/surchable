@@ -72,8 +72,7 @@ func (db *DB) UpsertPageLoad(pl *PageLoad) (uuid.UUID, error) {
 	row := tx.QueryRow(
 		`INSERT INTO "page_loads"("id", "url", "normalised_url", "loaded_at", "not_load_before")
 VALUES ($1, $2, $3, $4, $5)
-ON CONFLICT DO UPDATE SET "url"             = $2,
-                          "normalised_url"  = $3,
+ON CONFLICT ("normalised_url") DO UPDATE SET "url"             = $2,
                           "loaded_at"       = $4,
                           "not_load_before" = $5
 RETURNING "page_loads"."id";`,

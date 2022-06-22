@@ -27,12 +27,12 @@ CREATE TABLE "page_loads"
 
 CREATE TABLE "page_information"
 (
-    id                         UUID NOT NULL PRIMARY KEY,
-    load_id                    UUID NOT NULL REFERENCES "page_loads" (id),
+    id                         UUID        NOT NULL PRIMARY KEY,
+    load_id                    UUID UNIQUE NOT NULL REFERENCES "page_loads" (id),
     page_title                 TEXT,
     page_meta_description_text TEXT,
     page_content_text          TEXT,
-    page_raw_html              TEXT NOT NULL,
+    page_raw_html              TEXT        NOT NULL,
     raw_html_sha1              VARCHAR(40) NOT NULL,
     outbound_links             TEXT ARRAY
 );

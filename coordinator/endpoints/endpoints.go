@@ -1,8 +1,8 @@
 package endpoints
 
 import (
-	"github.com/codemicro/surchable/coordinator/endpoints/urls"
 	db "github.com/codemicro/surchable/internal/libdb"
+	"github.com/codemicro/surchable/internal/urls"
 	"github.com/codemicro/surchable/internal/util"
 	"github.com/gofiber/fiber/v2"
 )
@@ -30,6 +30,7 @@ func (e *Endpoints) SetupApp() *fiber.App {
 	app.Get(urls.CrawlerRequestJob, e.Get_CrawlerRequestJob)
 
 	app.Post(urls.RequestPreflightCheck, e.Post_RequestPreflightCheck)
+	app.Post(urls.DigestPageLoad, e.Post_DigestPageLoad)
 
 	return app
 }

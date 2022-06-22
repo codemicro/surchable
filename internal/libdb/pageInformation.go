@@ -2,6 +2,7 @@ package db
 
 import (
 	"crypto/sha1"
+	"encoding/hex"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
@@ -17,7 +18,7 @@ type PageInformation struct {
 	OutboundLinks           []string
 }
 
-func (db *DB) InsertPageInformation(pi *PageInformation) error {
+func (db *DB) UpsertPageInformation(pi *PageInformation) (uuid.UUID, error) {
 	if pi.ID == uuid.Nil {
 		pi.ID = uuid.New()
 	}
@@ -27,13 +28,21 @@ func (db *DB) InsertPageInformation(pi *PageInformation) error {
 
 	tx, err := db.pool.BeginTx(ctx, nil)
 	if err != nil {
-		return errors.WithStack(err)
+		return uuid.Nil, errors.WithStack(err)
 	}
 	defer smartRollback(tx)
 
-	_, err = tx.Exec(
-		`INSERT INTO "page_information"("id", "load_id", "page_title", "page_meta_description_text", "page_content_text", "page_raw_html", "raw_html_sha1", "outbound_links")
-		VALUES($1, $2, $3, $4, $5, $6, $7, $8);`,
+	row := tx.QueryRow(
+		`INSERT INTO "page_information"("id", "load_id", "page_title", "page_meta_description_text", "page_content_text",
+                               "page_raw_html", "raw_html_sha1", "outbound_links")
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+ON CONFLICT ("load_id") DO UPDATE SET "page_title"                 = $3,
+                          "page_meta_description_text" = $4,
+                          "page_content_text"          = $5,
+                          "page_raw_html"              = $6,
+                          "raw_html_sha1"              = $7,
+                          "outbound_links"             = $8
+RETURNING "page_information"."id";`,
 
 		pi.ID,
 		pi.LoadID,
@@ -41,14 +50,18 @@ func (db *DB) InsertPageInformation(pi *PageInformation) error {
 		pi.PageMetaDescriptionText,
 		pi.PageContentText,
 		pi.PageRawHTML,
-		pi.RawHTMLSHA1,
-		pi.OutboundLinks,
+		hex.EncodeToString(pi.RawHTMLSHA1[0:20]),
+		stringSliceToPGArray(pi.OutboundLinks),
 	)
-	if err != nil {
-		return errors.WithStack(err)
+
+	var newID uuid.UUID
+	if err := row.Scan(&newID); err != nil {
+		return uuid.Nil, errors.WithStack(err)
 	}
 
-	return errors.WithStack(
-		tx.Commit(),
-	)
+	if err := tx.Commit(); err != nil {
+		return uuid.Nil, errors.WithStack(err)
+	}
+
+	return newID, nil
 }

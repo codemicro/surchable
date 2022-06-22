@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/codemicro/surchable/internal/config"
@@ -71,4 +72,15 @@ func smartRollback(tx *sql.Tx) {
 	if err != nil && !errors.Is(err, sql.ErrTxDone) {
 		log.Warn().Stack().Err(errors.WithStack(err)).Str("location", "smartRollback").Msg("failed to rollback transaction")
 	}
+}
+
+func stringSliceToPGArray(items []string) string {
+	copiedItems := make([]string, len(items))
+	copy(copiedItems, items)
+
+	for i, item := range copiedItems {
+		copiedItems[i] = "'" + item + "'"
+	}
+
+	return "{" + strings.Join(copiedItems, ",") + "}"
 }

@@ -118,7 +118,8 @@ Request body:
     "https://www.popularmechanics.com/author/6836/joseph-truini/",
     "https://www.popularmechanics.com/space/a40230192/dyson-sphere-immortality/",
     "..."
-  ]
+  ],
+  "loadedAt": "1985-04-12T23:20:50.52Z" // required
 }
 ```
 
