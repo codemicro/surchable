@@ -12,7 +12,7 @@ import (
 var ErrDomainAlreadyQueued = errors.New("db: domain already queued")
 
 func (db *DB) AddDomainToQueue(domain string) (*uuid.UUID, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := db.newContext()
 	defer cancel()
 
 	tx, err := db.pool.BeginTx(ctx, nil)
@@ -45,13 +45,13 @@ func (db *DB) AddDomainToQueue(domain string) (*uuid.UUID, error) {
 }
 
 type QueueItem struct {
-	ID uuid.UUID
+	ID        uuid.UUID
 	CreatedAt time.Time
-	Domain string
+	Domain    string
 }
 
 func (db *DB) QueryDomainQueue(id uuid.UUID) (*QueueItem, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := db.newContext()
 	defer cancel()
 
 	stmt, err := db.pool.PrepareContext(ctx, `SELECT "id", "created_at", "domain" FROM "domain_queue" WHERE "id" = $1;`)
@@ -70,15 +70,15 @@ func (db *DB) QueryDomainQueue(id uuid.UUID) (*QueueItem, error) {
 }
 
 type CurrentJob struct {
-	ID uuid.UUID
-	QueueItem uuid.UUID
-	WorkerID string
+	ID              uuid.UUID
+	QueueItem       uuid.UUID
+	WorkerID        string
 	LastChecKInTime time.Time
 }
 
 var (
 	ErrNoQueuedDomains = errors.New("db: no queued domains")
-	ErrCrawlerIDInUse = errors.New("db: crawler ID in use")
+	ErrCrawlerIDInUse  = errors.New("db: crawler ID in use")
 )
 
 func (db *DB) RequestJobForCrawler(workerID string) (*CurrentJob, error) {
@@ -112,7 +112,7 @@ func (db *DB) RequestJobForCrawler(workerID string) (*CurrentJob, error) {
 		if e, ok := err.(*pq.Error); ok {
 			// If the subquery returns no results, it'll fail with this error
 			// because it returns null
-			switch e.Code{
+			switch e.Code {
 			case errorCodeNotNullViolation:
 				return nil, ErrNoQueuedDomains
 			case errorCodeUniqueViolation:
@@ -129,8 +129,8 @@ func (db *DB) RequestJobForCrawler(workerID string) (*CurrentJob, error) {
 	}
 
 	return &CurrentJob{
-		ID: newID,
-		WorkerID: workerID,
+		ID:        newID,
+		WorkerID:  workerID,
 		QueueItem: queueItem,
 	}, nil
 }

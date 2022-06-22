@@ -1,7 +1,6 @@
 package db
 
 import (
-	"context"
 	"database/sql"
 	"time"
 
@@ -26,7 +25,7 @@ func (db *DB) QueryPageLoadsByURL(url string) (*PageLoad, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := db.newContext()
 	defer cancel()
 
 	pageLoad := new(PageLoad)
