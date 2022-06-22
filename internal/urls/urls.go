@@ -11,6 +11,10 @@ cog.outl(
 	),
 )
 ]]]*/
+
+// The below was generated. Do not edit.
+// Modify mappings/urls instead.
+
 const (
 	OK                    = "/ok"
 	AddDomainToCrawlQueue = "/job/add"

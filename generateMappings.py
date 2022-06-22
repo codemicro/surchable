@@ -31,7 +31,7 @@ def parse_url_mappings(raw: str) -> Dict[str, str]:
 
 
 def generate_golang_url_mapping(mapping: Dict[str, str]) -> str:
-    o = "const (\n"
+    o = "\n\n// The below was generated. Do not edit.\n// Modify mappings/urls instead.\n\nconst (\n"
 
     for key in mapping:
         o += f'\t{key} = "{mapping[key]}"\n'
@@ -42,7 +42,7 @@ def generate_golang_url_mapping(mapping: Dict[str, str]) -> str:
 
 
 def generate_python_url_mapping(mapping: Dict[str, str]):
-    o = ""
+    o = "# The below was generated. Do not edit.\n# Modify mappings/urls instead.\n"
     for key in mapping:
         o += f'{_camel_to_snake(key).upper()} = "{mapping[key]}"\n'
     return o
@@ -82,7 +82,7 @@ def generate_golang_configuration(mapping: Dict[str, Tuple[str, Optional[str]]])
         else:
             raise NotImplementedError("subtypes more than one level deep")
 
-    o = ""
+    o = "\n\n// The below was generated. Do not edit.\n// Modify mappings/configuration instead.\n\n"
 
     def formFunctionCall(x: Tuple[str, str, Optional[str]]) -> str:
         return ('requireEnvVar' if x[2] is None else 'envVarDefault') + "(\"" + x[1] + "\"" + (', \"' + x[2] + '\"' if x[2] is not None else '') + ")"
@@ -103,7 +103,7 @@ def generate_golang_configuration(mapping: Dict[str, Tuple[str, Optional[str]]])
     return o
 
 def generate_python_configuration(mapping: Dict[str, Tuple[str, Optional[str]]]) -> str:
-    o = ""
+    o = "# The below was generated. Do not edit.\n# Modify mappings/urls instead.\n"
     for key in mapping:
         x = mapping[key]
         joined_key = ("_".join(map(_camel_to_snake, key.split(".")))).upper()

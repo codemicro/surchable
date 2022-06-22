@@ -9,6 +9,8 @@ cog.outl(
 	),
 )
 ]]]"""
+# The below was generated. Do not edit.
+# Modify mappings/urls instead.
 OK = "/ok"
 ADD_DOMAIN_TO_CRAWL_QUEUE = "/job/add"
 CRAWLER_REQUEST_JOB = "/job/request"

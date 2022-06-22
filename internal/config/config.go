@@ -44,6 +44,10 @@ cog.outl(
 	),
 )
 ]]]*/
+
+// The below was generated. Do not edit.
+// Modify mappings/configuration instead.
+
 var DB = struct {
 	DatabaseName string
 	User         string

@@ -35,6 +35,8 @@ cog.outl(
 	),
 )
 ]]]"""
+# The below was generated. Do not edit.
+# Modify mappings/urls instead.
 DB_DATABASE_NAME = _required_env_var("SURCHABLE_DB_DATABASE_NAME")
 DB_USER = _required_env_var("SURCHABLE_DB_USER")
 DB_PASSWORD = _required_env_var("SURCHABLE_DB_PASSWORD")
