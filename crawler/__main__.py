@@ -2,7 +2,7 @@ from typing import *
 import structlog
 
 
-def event_to_message_log_processor(logger: Any, _: str, event_dict: dict) -> dict:
+def event_to_message_log_processor(_: Any, __: str, event_dict: dict) -> dict:
     # This method is for rough Zerolog compatibility
 
     if "event" in event_dict:
