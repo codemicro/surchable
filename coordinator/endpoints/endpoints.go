@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"fmt"
 	db "github.com/codemicro/surchable/internal/libdb"
 	"github.com/codemicro/surchable/internal/urls"
 	"github.com/codemicro/surchable/internal/util"
@@ -33,4 +34,16 @@ func (e *Endpoints) SetupApp() *fiber.App {
 	app.Post(urls.DigestPageLoad, e.Post_DigestPageLoad)
 
 	return app
+}
+
+func getCrawlerIDHeader(ctx *fiber.Ctx) (string, error) {
+	crawlerID := ctx.Get(headerCrawlerID)
+	if crawlerID == "" {
+		return "", util.NewRichError(
+			fiber.StatusBadRequest,
+			fmt.Sprintf("%s header missing", headerCrawlerID),
+			nil,
+		)
+	}
+	return crawlerID, nil
 }

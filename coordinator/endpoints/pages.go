@@ -56,6 +56,11 @@ func (e *Endpoints) Post_DigestPageLoad(ctx *fiber.Ctx) error {
 		LoadedAt      time.Time `json:"loadedAt" validate:"required"`
 	}
 
+	crawlerID, err := getCrawlerIDHeader(ctx)
+	if err != nil {
+		return err
+	}
+
 	inputData := new(schema)
 	if err := util.ParseAndValidateJSONBody(ctx, inputData); err != nil {
 		return err
@@ -87,6 +92,10 @@ func (e *Endpoints) Post_DigestPageLoad(ctx *fiber.Ctx) error {
 	})
 
 	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	if err := e.db.UpdateTimeForJobByWorkerID(crawlerID, time.Now()); err != nil {
 		return errors.WithStack(err)
 	}
 

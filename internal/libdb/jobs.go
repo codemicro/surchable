@@ -72,3 +72,25 @@ func (db *DB) RequestJobForCrawler(workerID string) (*CurrentJob, error) {
 		QueueItem: queueItem,
 	}, nil
 }
+
+func (db *DB) UpdateTimeForJobByWorkerID(workerID string, checkInTime time.Time) error {
+	ctx, cancel := db.newContext()
+	defer cancel()
+
+	tx, err := db.pool.BeginTx(ctx, nil)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	if _, err := tx.Exec(
+		`UPDATE "current_jobs" SET "last_check_in" = $1 WHERE "crawler_id" = $1;`,
+		checkInTime,
+		workerID,
+	); err != nil {
+		return errors.WithStack(err)
+	}
+
+	return errors.WithStack(
+		tx.Commit(),
+	)
+}
