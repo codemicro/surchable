@@ -81,5 +81,7 @@ func (db *DB) InsertPageLoad(pl *PageLoad) error {
 		return errors.WithStack(err)
 	}
 
-	return nil
+	return errors.WithStack(
+		tx.Commit(),
+	)
 }
