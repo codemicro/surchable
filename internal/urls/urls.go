@@ -16,6 +16,7 @@ const (
 	AddDomainToCrawlQueue = "/job/add"
 	CrawlerRequestJob     = "/job/request"
 	RequestPreflightCheck = "/page/preflight"
+	DigestPageLoad        = "/page/digest"
 )
 
 // [[[end]]]
