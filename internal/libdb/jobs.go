@@ -81,6 +81,7 @@ func (db *DB) UpdateTimeForJobByWorkerID(workerID string, checkInTime time.Time)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	defer smartRollback(tx)
 
 	if _, err := tx.Exec(
 		`UPDATE "current_jobs" SET "last_check_in" = $1 WHERE "crawler_id" = $1;`,
