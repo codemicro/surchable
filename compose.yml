@@ -2,7 +2,7 @@ name: surchable
 
 services:
   db:
-    image: "postgres:14"
+    image: "postgres:14.4"
     restart: unless-stopped
     volumes:
       - db:/var/lib/postgresql/data
