@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"crypto/sha1"
+	"github.com/codemicro/surchable/internal/search"
 	"time"
 
 	db "github.com/codemicro/surchable/internal/libdb"
@@ -70,6 +71,13 @@ func (e *Endpoints) Post_DigestPageLoad(ctx *fiber.Ctx) error {
 		inputData.NotLoadBefore = 60
 	}
 
+	// putting this here will ensure that a worker is currently doing something
+	// if not, an internal server error will be thrown
+	// TODO: make this return a proper error instead of HTTP 500
+	if err := e.db.UpdateTimeForJobByWorkerID(crawlerID, time.Now()); err != nil {
+		return errors.WithStack(err)
+	}
+
 	pageLoadID, err := e.db.UpsertPageLoad(&db.PageLoad{
 		URL:      inputData.URL,
 		LoadedAt: inputData.LoadedAt,
@@ -81,7 +89,7 @@ func (e *Endpoints) Post_DigestPageLoad(ctx *fiber.Ctx) error {
 		return errors.WithStack(err)
 	}
 
-	_, err = e.db.UpsertPageInformation(&db.PageInformation{
+	pageID, err := e.db.UpsertPageInformation(&db.PageInformation{
 		LoadID:                  pageLoadID,
 		PageTitle:               util.PtrNilIfDefault(inputData.Title),
 		PageMetaDescriptionText: util.PtrNilIfDefault(inputData.Description),
@@ -95,7 +103,15 @@ func (e *Endpoints) Post_DigestPageLoad(ctx *fiber.Ctx) error {
 		return errors.WithStack(err)
 	}
 
-	if err := e.db.UpdateTimeForJobByWorkerID(crawlerID, time.Now()); err != nil {
+	tokenMap := make(db.TokenMap)
+	tokenMap.Add(search.TokeniseString(inputData.Content), db.IndexClassPageBody)
+	tokenMap.Add(search.TokeniseString(inputData.Description), db.IndexClassPageDescription)
+	tokenMap.Add(search.TokeniseString(inputData.Title), db.IndexClassPageTitle)
+
+	if err := e.db.SearchIndexUpsert(&db.TokenSet{
+		PageID: pageID,
+		Tokens: tokenMap,
+	}); err != nil {
 		return errors.WithStack(err)
 	}
 

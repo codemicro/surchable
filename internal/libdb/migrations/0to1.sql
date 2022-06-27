@@ -37,6 +37,21 @@ CREATE TABLE "page_information"
     outbound_links             TEXT ARRAY
 );
 
+CREATE TABLE "search_index"
+(
+    token TEXT NOT NULL,
+    page_id UUID NOT NULL REFERENCES "page_information" (id),
+    classification BIT(5) NOT NULL
+);
+
+CREATE TABLE "token_frequencies"
+(
+    token TEXT NOT NULL,
+    page_id UUID NOT NULL REFERENCES "page_information" (id),
+    frequency INT NOT NULL,
+    classification BIT(5) NOT NULL
+);
+
 CREATE TABLE "version"
 (
     version INT
