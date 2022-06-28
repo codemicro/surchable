@@ -48,7 +48,7 @@ func (db *DB) RequestJobForCrawler(workerID string) (*CurrentJob, error) {
 			case errorCodeNotNullViolation:
 				return nil, ErrNoQueuedDomains
 			case errorCodeUniqueViolation:
-				if e.Constraint == "current_jobs_worker_id_key" {
+				if e.Constraint == "current_jobs_crawler_id_key" {
 					return nil, ErrCrawlerIDInUse
 				}
 			}
