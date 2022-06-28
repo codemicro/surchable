@@ -8,9 +8,11 @@ import (
 	"github.com/pkg/errors"
 )
 
+const DefaultDomainQueuePriority = 0
+
 var ErrDomainAlreadyQueued = errors.New("db: domain already queued")
 
-func (db *DB) AddDomainToQueue(domain string) (*uuid.UUID, error) {
+func (db *DB) AddDomainToQueue(domain string, priority int) (*uuid.UUID, error) {
 	ctx, cancel := db.newContext()
 	defer cancel()
 
@@ -21,7 +23,7 @@ func (db *DB) AddDomainToQueue(domain string) (*uuid.UUID, error) {
 	defer smartRollback(tx)
 
 	id := uuid.New()
-	if _, err := tx.Exec(`INSERT INTO "domain_queue"("id", "domain") VALUES($1, $2)`, id, domain); err != nil {
+	if _, err := tx.Exec(`INSERT INTO "domain_queue"("id", "domain", "priority") VALUES($1, $2, $3)`, id, domain, priority); err != nil {
 		if e, ok := err.(*pq.Error); ok {
 			if e.Code == errorCodeUniqueViolation {
 				return nil, ErrDomainAlreadyQueued
@@ -41,6 +43,7 @@ type QueueItem struct {
 	ID        uuid.UUID
 	CreatedAt time.Time
 	Domain    string
+	Priority  int
 }
 
 func (db *DB) QueryDomainQueue(id uuid.UUID) (*QueueItem, error) {
@@ -51,9 +54,9 @@ func (db *DB) QueryDomainQueue(id uuid.UUID) (*QueueItem, error) {
 
 	if err := db.pool.QueryRowContext(
 		ctx,
-		`SELECT "id", "created_at", "domain" FROM "domain_queue" WHERE "id" = $1;`,
+		`SELECT "id", "created_at", "domain", "priority" FROM "domain_queue" WHERE "id" = $1;`,
 		id,
-	).Scan(&qi.ID, &qi.CreatedAt, &qi.Domain); err != nil {
+	).Scan(&qi.ID, &qi.CreatedAt, &qi.Domain, &qi.Priority); err != nil {
 		return nil, errors.Wrap(err, "could not scan")
 	}
 

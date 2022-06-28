@@ -37,7 +37,7 @@ func (db *DB) RequestJobForCrawler(workerID string) (*CurrentJob, error) {
 			(SELECT "id"
 			 FROM "domain_queue"
 			 WHERE "id" NOT IN (SELECT "queue_item" FROM "current_jobs")
-			 ORDER BY "created_at"
+			 ORDER BY "priority" DESC, "created_at"
 			 LIMIT 1), $2)
 	RETURNING "current_jobs"."queue_item";`, newID, workerID)
 	if err := row.Scan(&queueItem); err != nil {
@@ -100,10 +100,30 @@ func (db *DB) RemoveTimedOutJobs() error {
 	}
 	defer smartRollback(tx)
 
-	if _, err := tx.Exec(
-		`DELETE FROM "current_jobs" WHERE "last_check_in" < now()-'10 minute'::interval;`,
-	); err != nil {
-		return err
+	rows, err := tx.Query(`SELECT "id", "queue_item" FROM "current_jobs" WHERE "last_check_in" < now()-'10 minute'::interval;`)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	var ids [][2]uuid.UUID
+
+	for rows.Next() {
+		var jobID, queueItemID uuid.UUID
+		if err := rows.Scan(&jobID, &queueItemID); err != nil {
+			return errors.WithStack(err)
+		}
+
+		ids = append(ids, [2]uuid.UUID{jobID, queueItemID})
+	}
+
+	for _, item := range ids {
+		if _, err := tx.Exec(`UPDATE "domain_queue" SET "priority" = 5 WHERE "id" = $1;`, item[1]); err != nil {
+			return errors.WithStack(err)
+		}
+
+		if _, err := tx.Exec(`DELETE FROM "current_jobs" WHERE "id" = $1;`, item[0]); err != nil {
+			return errors.WithStack(err)
+		}
 	}
 
 	return errors.WithStack(

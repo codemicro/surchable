@@ -52,7 +52,7 @@ func startTimeoutWorker(database *db.DB, interval time.Duration) {
 			log.Info().Msg("running job timeout worker")
 			err := database.RemoveTimedOutJobs()
 			if err != nil {
-				log.Error().Err(err).Str("location", "timeoutWorker").Send()
+				log.Error().Stack().Err(err).Str("location", "timeoutWorker").Send()
 			}
 		}
 	}()

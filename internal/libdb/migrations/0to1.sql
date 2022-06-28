@@ -5,7 +5,8 @@ CREATE TABLE "domain_queue"
 (
     id         UUID                NOT NULL PRIMARY KEY,
     created_at TIMESTAMP           NOT NULL DEFAULT now(),
-    domain     VARCHAR(253) UNIQUE NOT NULL
+    domain     VARCHAR(253) UNIQUE NOT NULL,
+    priority   INT                 NOT NULL DEFAULT 0
 );
 
 CREATE TABLE "current_jobs"
@@ -39,16 +40,16 @@ CREATE TABLE "page_information"
 
 CREATE TABLE "search_index"
 (
-    token TEXT NOT NULL,
-    page_id UUID NOT NULL REFERENCES "page_information" (id),
+    token          TEXT   NOT NULL,
+    page_id        UUID   NOT NULL REFERENCES "page_information" (id),
     classification BIT(5) NOT NULL
 );
 
 CREATE TABLE "token_frequencies"
 (
-    token TEXT NOT NULL,
-    page_id UUID NOT NULL REFERENCES "page_information" (id),
-    frequency INT NOT NULL,
+    token          TEXT   NOT NULL,
+    page_id        UUID   NOT NULL REFERENCES "page_information" (id),
+    frequency      INT    NOT NULL,
     classification BIT(5) NOT NULL
 );
 
