@@ -67,6 +67,6 @@ func (e *Endpoints) Get_CrawlerRequestJob(ctx *fiber.Ctx) error {
 	return ctx.JSON(&response{
 		ID:     createdJob.ID,
 		Domain: queueItem.Domain,
-		Start:  "/",
+		Start:  queueItem.StartPath,
 	})
 }
