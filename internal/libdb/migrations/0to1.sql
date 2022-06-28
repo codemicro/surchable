@@ -6,6 +6,7 @@ CREATE TABLE "domain_queue"
     id         UUID                NOT NULL PRIMARY KEY,
     created_at TIMESTAMP           NOT NULL DEFAULT now(),
     domain     VARCHAR(253) UNIQUE NOT NULL,
+    start      TEXT                NOT NULL DEFAULT '/',
     priority   INT                 NOT NULL DEFAULT 0
 );
 

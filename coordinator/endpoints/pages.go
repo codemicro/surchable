@@ -3,6 +3,7 @@ package endpoints
 import (
 	"crypto/sha1"
 	"github.com/codemicro/surchable/internal/search"
+	"net/url"
 	"time"
 
 	db "github.com/codemicro/surchable/internal/libdb"
@@ -101,6 +102,14 @@ func (e *Endpoints) Post_DigestPageLoad(ctx *fiber.Ctx) error {
 
 	if err != nil {
 		return errors.WithStack(err)
+	}
+
+	for _, outboundLink := range inputData.OutboundLinks {
+		u, _ := url.Parse(outboundLink) // URL already validated
+		_, err := e.db.AddDomainToQueue(u.Host, u.EscapedPath(), db.DefaultDomainQueuePriority)
+		if err != nil && !errors.Is(err, db.ErrDomainAlreadyQueued) {
+			return errors.WithStack(err)
+		}
 	}
 
 	tokenMap := make(db.TokenMap)
