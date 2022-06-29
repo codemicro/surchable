@@ -29,6 +29,8 @@ func (e *Endpoints) SetupApp() *fiber.App {
 
 	app.Post(urls.AddDomainToCrawlQueue, e.Post_AddDomainToQueue)
 	app.Get(urls.CrawlerRequestJob, e.Get_CrawlerRequestJob)
+	app.Post(urls.CancelJob, e.Post_CancelJob)
+	app.Post(urls.CompleteJob, e.Post_CompleteJob)
 
 	app.Post(urls.RequestPreflightCheck, e.Post_RequestPreflightCheck)
 	app.Post(urls.DigestPageLoad, e.Post_DigestPageLoad)

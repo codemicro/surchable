@@ -19,6 +19,8 @@ const (
 	OK                    = "/ok"
 	AddDomainToCrawlQueue = "/job/add"
 	CrawlerRequestJob     = "/job/request"
+	CancelJob             = "/job/cancel"
+	CompleteJob           = "/job/complete"
 	RequestPreflightCheck = "/page/preflight"
 	DigestPageLoad        = "/page/digest"
 )

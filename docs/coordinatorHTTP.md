@@ -126,3 +126,25 @@ Request body:
 Possible responses:
 
 * **204 No Content** - all's good.
+
+## Mark job as completed
+
+**`POST /job/complete`**
+
+The `X-Crawler-ID` header must be set.
+
+Possible responses:
+
+* `200 OK` - doneso.
+* `409 Conflict` - crawler has no active job.
+
+## Mark job as cancelled
+
+**`POST /job/cancel`**
+
+The `X-Crawler-ID` header must be set.
+
+Possible responses:
+
+* `200 OK` - doneso.
+* `409 Conflict` - crawler has no active job.

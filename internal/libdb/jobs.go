@@ -130,3 +130,67 @@ func (db *DB) RemoveTimedOutJobs() error {
 		tx.Commit(),
 	)
 }
+
+var ErrNoActiveJob = errors.New("db: no active jobs with a matching crawler ID")
+
+func (db *DB) CompleteJobByCrawlerID(crawlerID string) error {
+	ctx, cancel := db.newContext()
+	defer cancel()
+
+	tx, err := db.pool.BeginTx(ctx, nil)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	defer smartRollback(tx)
+
+	mods, err := tx.Exec(
+		`WITH job_info AS (
+			DELETE FROM "current_jobs" WHERE "crawler_id" = $1 RETURNING "queue_item"
+			) DELETE FROM "domain_queue" WHERE "id" = (SELECT "queue_item" FROM "job_info");`,
+		crawlerID,
+	)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	if n, err := mods.RowsAffected(); err != nil {
+		return errors.WithStack(err)
+	} else if n == 0 {
+		return ErrNoActiveJob
+	}
+
+	return errors.WithStack(
+		tx.Commit(),
+	)
+}
+
+func (db *DB) CancelJobByCrawlerID(crawlerID string) error {
+	ctx, cancel := db.newContext()
+	defer cancel()
+
+	tx, err := db.pool.BeginTx(ctx, nil)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	defer smartRollback(tx)
+
+	mods, err := tx.Exec(
+		`WITH job_info AS (
+			DELETE FROM "current_jobs" WHERE "crawler_id" = $1 RETURNING "queue_item"
+			) UPDATE "domain_queue" SET "priority" = 3 WHERE "id" = (SELECT "queue_item" FROM "job_info");`,
+		crawlerID,
+	)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	if n, err := mods.RowsAffected(); err != nil {
+		return errors.WithStack(err)
+	} else if n == 0 {
+		return ErrNoActiveJob
+	}
+
+	return errors.WithStack(
+		tx.Commit(),
+	)
+}
