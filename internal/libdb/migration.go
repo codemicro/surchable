@@ -45,7 +45,7 @@ func (db *DB) Migrate() error {
 			return errors.WithStack(err)
 		}
 	}
-	
+
 	if x := len(migrationFunctions); databaseVersion == x {
 		log.Info().Msg("migrations up-to-date without any changes")
 		return nil

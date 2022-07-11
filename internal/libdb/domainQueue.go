@@ -12,7 +12,7 @@ const DefaultDomainQueuePriority = 0
 
 var (
 	ErrDomainAlreadyQueued = errors.New("db: domain already queued")
-	ErrDomainInBlocklist = errors.New("db: domain in blocklist")
+	ErrDomainInBlocklist   = errors.New("db: domain in blocklist")
 )
 
 func (db *DB) AddDomainToQueue(domain string, path string, priority int) (*uuid.UUID, error) {

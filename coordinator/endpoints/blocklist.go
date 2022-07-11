@@ -30,4 +30,3 @@ ok:
 	ctx.Status(fiber.StatusNoContent)
 	return nil
 }
-
