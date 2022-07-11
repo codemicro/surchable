@@ -28,6 +28,9 @@ func (e *Endpoints) Post_AddDomainToQueue(ctx *fiber.Ctx) error {
 		if errors.Is(err, db.ErrDomainAlreadyQueued) {
 			return util.NewRichError(fiber.StatusConflict, "domain already queued", nil)
 		}
+		if errors.Is(err, db.ErrDomainInBlocklist) {
+			return util.NewRichError(fiber.StatusConflict, "domain in blocklist", nil)
+		}
 		return errors.WithStack(err)
 	}
 

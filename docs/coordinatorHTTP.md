@@ -36,10 +36,10 @@ Possible responses:
     "status": "error"
     }
     ```
-* **409 Conflict** - domain+subdomain combination has already been enqueued
+* **409 Conflict** - domain+subdomain combination has already been enqueued or is in the blocklist
     ```json
     {
-        "message": "domain already queued",
+        "message": "domain already queued/domain in blocklist",
         "status": "error"
     }
     ```
@@ -148,3 +148,20 @@ Possible responses:
 
 * `200 OK` - doneso.
 * `409 Conflict` - crawler has no active job.
+
+## Add a domain to the blocklist
+
+**`POST /blocklist/add`**
+
+Request body:
+
+```json
+{
+    "domain": "ads.example.com",
+    "reason": "Advertising"
+}
+```
+
+Possible responses:
+
+* `204 No Content` - accepted, all is ok

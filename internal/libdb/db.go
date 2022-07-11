@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/codemicro/surchable/internal/config"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -83,4 +83,13 @@ func stringSliceToPGArray(items []string) string {
 	}
 
 	return "{" + strings.Join(copiedItems, ",") + "}"
+}
+
+func isPostgresErrWithCode(err error, errorCode string) bool {
+	if e, ok := err.(*pq.Error); ok {
+		if string(e.Code) == errorCode {
+			return true
+		}
+	}
+	return false
 }

@@ -18,5 +18,6 @@ CANCEL_JOB = "/job/cancel"
 COMPLETE_JOB = "/job/complete"
 REQUEST_PREFLIGHT_CHECK = "/page/preflight"
 DIGEST_PAGE_LOAD = "/page/digest"
+BLOCKLIST_ADD = "/blocklist/add"
 
 # [[[end]]]

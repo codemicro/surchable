@@ -35,6 +35,8 @@ func (e *Endpoints) SetupApp() *fiber.App {
 	app.Post(urls.RequestPreflightCheck, e.Post_RequestPreflightCheck)
 	app.Post(urls.DigestPageLoad, e.Post_DigestPageLoad)
 
+	app.Post(urls.BlocklistAdd, e.Post_AddDomainToBlocklist)
+
 	return app
 }
 

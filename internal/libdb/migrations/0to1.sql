@@ -10,6 +10,12 @@ CREATE TABLE "domain_queue"
     priority   INT                 NOT NULL DEFAULT 0
 );
 
+CREATE TABLE "domain_blocklist"
+(
+    domain TEXT NOT NULL PRIMARY KEY,
+    reason TEXT NOT NULL
+);
+
 CREATE TABLE "current_jobs"
 (
     id            UUID        NOT NULL PRIMARY KEY,

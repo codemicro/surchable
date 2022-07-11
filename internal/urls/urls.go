@@ -23,6 +23,7 @@ const (
 	CompleteJob           = "/job/complete"
 	RequestPreflightCheck = "/page/preflight"
 	DigestPageLoad        = "/page/digest"
+	BlocklistAdd          = "/blocklist/add"
 )
 
 // [[[end]]]
