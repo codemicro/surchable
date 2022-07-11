@@ -60,13 +60,6 @@ class Coordinator:
         logger.info("established connection to coordinator")
 
     def add_domain_to_crawl_queue(self, domain: str):
-        """
-        add_domain_to_crawl_queue adds the specified domain to the queue to crawl. It can be a combination of a
-        subdomain and a domain or just a domain.
-
-        :param domain: the domain to be added to the queue.
-        :return: None
-        """
         r = self.session.post(self._make_url(urls.ADD_DOMAIN_TO_CRAWL_QUEUE), data={"domain": domain})
 
         if r.status_code == 202 or r.status_code == 409:
@@ -75,12 +68,6 @@ class Coordinator:
         r.raise_for_status()
 
     def request_job(self, raise_on_bad_id: bool = False) -> Optional[Job]:
-        """
-        request_job requests a job to be run from the coordinator.
-
-        :param raise_on_bad_id: if the UUID selected for the crawler is in use, raise an exception
-        :return: None of there's no job in the queue, or a Job
-        """
         r = self.session.post(self._make_url(urls.CRAWLER_REQUEST_JOB))
 
         if r.status_code == 409 and not raise_on_bad_id:  # 409 conflict - another crawler already has this ID, which is
@@ -100,12 +87,6 @@ class Coordinator:
         return Job(response_json["id"], response_json["domain"], response_json["start"])
 
     def preflight_check(self, url: str) -> bool:
-        """
-        preflight_check checks that the provided URL is allowed to be loaded or not.
-
-        :param url: URL to query against
-        :return: True if load can go ahead, False if URL should be skipped.
-        """
         r = self.session.post(self._make_url(urls.REQUEST_PREFLIGHT_CHECK), data={"url": url})
         r.raise_for_status()
 
@@ -121,19 +102,25 @@ class Coordinator:
 
     def digest_loaded_page(self, url: str, html: str, loaded_at: datetime.datetime,
                            extra_data: Optional[Dict[str, Any]] = None):
-        """
-        digest_loaded_page returns the result of a page load to the coordinator for storage.
-
-        :param url: URL of the loaded page
-        :param html: raw HTML of the loaded page
-        :param loaded_at: time of page load
-        :param extra_data: extra data to send to the coordinator. This will be piped directly into the request.
-        :return: None
-        """
         r = self.session.post(self._make_url(urls.DIGEST_PAGE_LOAD), data={
             "url": url,
             "html": html,
             "loaded_at": loaded_at.isoformat(),
             **extra_data,
+        })
+        r.raise_for_status()
+
+    def mark_job_completed(self):
+        r = self.session.post(self._make_url(urls.COMPLETE_JOB))
+        r.raise_for_status()
+
+    def mark_job_cancelled(self):
+        r = self.session.post(self._make_url(urls.CANCEL_JOB))
+        r.raise_for_status()
+
+    def add_domain_to_blocklist(self, domain: str, reason: str):
+        r = self.session.post(self._make_url(urls.BLOCKLIST_ADD), data={
+            "domain": domain,
+            "reason": reason,
         })
         r.raise_for_status()
